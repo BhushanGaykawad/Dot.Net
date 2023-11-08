@@ -1,0 +1,66 @@
+using System.Linq;
+
+namespace Linq
+{
+    public class Employee
+    {
+        public int Id { get; set; }
+        public string EmpName { get; set; }
+        public int Detid;
+
+        public Employee(string Empname,int i) 
+        {
+            EmpName = Empname;
+            Detid = i;
+        }
+       
+    }
+    public enum DeptName
+    {
+        ADV, HR, ADMIN
+    };
+    public  class Department
+    {
+        public int Detid;
+        public DeptName Dept;
+        public Department(int i, DeptName name)
+        {
+            Detid=i;
+            Dept = name;
+        }
+    }
+   
+    
+
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Employee[] emp =
+            {
+                new Employee("Bhushan",1),
+                new Employee("Rohit",2),
+                new Employee("Prasant",3)
+
+            };
+
+
+            Department[] Dept =
+            {
+                new Department(1,DeptName.HR),
+                new Department(2, DeptName.ADMIN),
+                new Department(3, DeptName.HR)
+
+            };
+
+            var Disp=from employee in emp join deptt in Dept on employee.Detid equals deptt.Detid
+                     select new { Name = employee.EmpName, Dept= deptt.Dept };
+            foreach (var q in Disp) {
+                Console.WriteLine(q.Name+" "+q.Dept);
+
+            }
+
+
+        }
+    }
+}
