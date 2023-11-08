@@ -1,0 +1,99 @@
+namespace Linq
+{
+    class ProductInfo
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int NumberInStock { get; set; }
+        public override string ToString()
+        {
+            return string.Format("Name={0}, Description={1}, Number in Stock={2}",
+            Name, Description, NumberInStock);
+        }
+    }
+
+    
+
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("***** Fun with Query Expressions *****\n");
+            // This array will be the basis of our testing...
+            ProductInfo[] itemsInStock = new[]
+            {
+                new ProductInfo{ Name = "Mac's Coffee", Description = "Coffee with TEETH",
+                                         NumberInStock = 24},
+                new ProductInfo { Name = "Milk Maid Milk",Description = "Milk cow's love",
+                                            NumberInStock = 100},
+                new ProductInfo{ Name = "Pure Silk Tofu",  Description = "Bland as Possible",
+                                            NumberInStock = 120},
+                new ProductInfo{ Name = "Cruchy Pops",  Description = "Cheezy, peppery goodness",
+                                        NumberInStock = 2},
+                new ProductInfo{ Name = "RipOff Water",   Description = "From the tap to your wallet",
+                                        NumberInStock = 100},
+                new ProductInfo{ Name = "Classic Valpo Pizza", Description = "Everyone loves pizza!",
+                 NumberInStock = 73}
+            };
+            var query = from r in itemsInStock select r;
+            foreach (var item in query)
+            {
+                Console.WriteLine(item.Name + " - " + item.Description + " - " + item.NumberInStock);
+            }
+
+            Console.WriteLine("_____________2_________________");
+            var query1 = from a in itemsInStock select a.Name;
+            foreach (var item in query1) { Console.WriteLine(item); };
+
+            Console.WriteLine("_____________3_________________");
+            var product = from r in itemsInStock select new { Name = r.Name, des = r.Description };
+            foreach (var item in product) { Console.WriteLine(item); };
+
+            Console.WriteLine("_____________4_________________");
+            var prod = from s in itemsInStock where s.NumberInStock == 100 select new { name = s.Name, desc = s.Description };
+            foreach (var i in prod)
+            {
+                Console.WriteLine(i.name + " - " + i.desc);
+            }
+
+            Console.WriteLine("__________5_______________");
+            var prod5=from t in itemsInStock where t.Name.Contains("'s") orderby t select t.Name;
+            foreach(var  i in prod5) 
+            {
+                Console.WriteLine(i);
+            }
+
+            Console.WriteLine("__________5_______________");
+            var prod6 = from t in itemsInStock where t.Name.Contains("'s") orderby t.Name descending select t.Name;
+            foreach (var i in prod6)
+            {
+                Console.WriteLine(i);
+            }
+
+            Console.WriteLine("__________6______________");
+            var prod7 = (from y in itemsInStock where y.NumberInStock > 100 select y).Count();
+            Console.WriteLine(prod7);
+
+            Console.WriteLine("____________7_______________");
+            var prod8=(from b in itemsInStock select b.NumberInStock).Min();
+            Console.WriteLine(prod8);
+
+            Console.WriteLine("___________________8_______________");
+            var prod9 = (from b in itemsInStock select b.NumberInStock).Max();
+            Console.WriteLine(prod9);
+
+            Console.WriteLine("__________________9_____________________");
+            var prod10=(from k in itemsInStock select k.NumberInStock).Average();
+            Console.WriteLine(prod10);
+
+            Console.WriteLine("_________________10_______________________");
+            var res=(from l in itemsInStock where l.NumberInStock==prod9 select l);
+            foreach(var i in res)
+            {
+                Console.WriteLine(i);
+            }
+
+
+        }
+    }
+}
