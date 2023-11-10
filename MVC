@@ -1,0 +1,241 @@
+//Controller:
+
+using AuthorBook.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AuthorBook.Controllers
+{
+    public class BookController : Controller
+    {
+        public IBookRepository _BookRepository;
+
+
+        public BookController(IBookRepository repository)
+        {
+            _BookRepository = repository;
+            
+        }
+
+        //GET: AllBooks
+        public ActionResult Index()
+        {
+            var model=_BookRepository.GetAllBooks();
+            return View(model);
+        }
+
+        public ActionResult Details(int id)
+        {
+            var model=_BookRepository.GetBook(id);
+            return View(model);
+       
+        }
+
+        public ActionResult Create()
+        {
+            return View();
+           
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Book book)
+        {
+            try
+            {
+                var model = _BookRepository.Add(book);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+
+        }
+
+        public ActionResult Edit(int id)
+        {
+            var model= _BookRepository.GetBook(id);
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, Book book)
+        {
+            if (ModelState.IsValid)
+            {
+                var model = _BookRepository.Update(book);
+                return RedirectToAction(nameof(Index));
+            }
+            return View();
+        }
+
+        public ActionResult Delete(int id)
+        {
+            var model=_BookRepository.Delete(id);
+            return View(model);
+            
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete1 (int id)
+        {
+            if(ModelState.IsValid)
+            {
+                var model=_BookRepository.Delete(id);
+                return RedirectToAction(nameof(Index));
+            }
+            return View();
+        }
+
+    }
+}
+
+
+
+
+//Interface:Book
+namespace AuthorBook.Models
+{
+    public interface IBookRepository
+    {
+        Book GetBook(int id);
+
+        IEnumerable<Book> GetAllBooks();
+
+        Book Add(Book book);
+        Book Update(Book book);
+        Book Delete(int id);
+
+
+    }
+}
+
+
+//SQL Reposoitory:
+
+using Microsoft.AspNetCore.Mvc;
+
+namespace AuthorBook.Models
+{
+    public class SQLBookRepository:IBookRepository
+    {
+        private readonly AppDbContext _context;
+
+        public SQLBookRepository(AppDbContext context) 
+        {
+            _context = context;
+        }
+
+        public IEnumerable<Book>GetAllBooks()
+        {
+            return _context.Books;  
+        }
+
+        public Book GetBook(int id)
+        {
+            return _context.Books.Find(id);
+        }
+
+        
+        public Book Add(Book book)
+        {
+            _context.Books.Add(book);
+            _context.SaveChanges();
+            return book;
+
+        }
+
+        public Book Update(Book bookchange)
+        {
+            var book= _context.Books.Attach(bookchange);
+            book.State=Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _context.Update(bookchange);
+            _context.SaveChanges();
+            return bookchange;
+
+        }
+
+        public Book Delete(int id)
+        {
+            var model=_context.Books.Find(id);
+            if (model!=null)
+            {
+                _context.Books.Remove(model);
+                _context.SaveChanges();
+            }
+            return model;
+
+        }
+
+
+       
+
+      
+    }
+}
+
+
+//JSON:
+
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "Default": "Data Source=(localdb)\\ProjectModels;Initial Catalog=Demo_Product;Integrated Security=True;"
+  },
+  "AllowedHosts": "*"
+}
+
+
+//POCO Class: Book
+namespace AuthorBook.Models
+{
+    public class Book
+    {
+        public int Id { get; set; }
+        public string? BookName { get; set; }
+        
+        public  Author? Author { get; set; }    
+        public int AuthorID { get; set; }
+
+      
+
+    }
+}
+
+
+//POCO class: Author
+namespace AuthorBook.Models
+{
+    public class Author
+    {
+        public int AuthorId {  get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+
+        public List<Book>? Books { get; set; }
+    }
+}
+
+
+//Context class:
+
+using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
+
+namespace AuthorBook.Models
+{
+    public class AppDbContext:DbContext
+    {
+       public AppDbContext(DbContextOptions<AppDbContext>options):base(options) 
+        {
+        }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Author> Authors { get; set; }
+    }
+}
+
