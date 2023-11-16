@@ -1,0 +1,153 @@
+//Employee POCO class
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InMemoryCrud2
+{
+    internal class Employee
+    {
+        public int Id { get; set; } 
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public double Salary {  get; set; }
+
+        public string Gender { get; set; }
+
+        public string Address { get; set; }
+
+        public enum Dept
+        {
+            ADV, MKT,Sales 
+        }
+    }
+}
+
+// IEmployee interface
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InMemoryCrud2
+{
+    internal interface IEmployee
+    {
+        Employee GetEmployee(int id);
+        IEnumerable<Employee> GetAllEmployee();
+
+        Employee Add(Employee employee);
+        Employee Update(Employee empChange);
+
+        Employee Delete(int id);
+
+    }
+}
+
+
+// Service class:
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InMemoryCrud2
+{
+    internal class EmployeeServices : IEmployee
+    {
+        private List<Employee> EmpList=new List<Employee>()
+        {
+            new Employee{Id=1,FirstName="Rohit",LastName="Maskar",Gender="male",Address="Kandevali",Salary=90000},
+            new Employee{Id=2,FirstName="Nikhil",LastName="Maskar",Gender="male",Address="Chandrapur",Salary=10000},
+            new Employee{Id=3,FirstName="Shantanu",LastName="Maskar",Gender="male",Address="Pune",Salary=120000},
+            new Employee{Id=4,FirstName="Sanket",LastName="Maskar",Gender="male",Address="Mumbai",Salary=80000},
+           
+
+        };
+
+        public Employee Add(Employee employee)
+        {
+            employee.Id = EmpList.Max(e=>e.Id)+ 1;
+            EmpList.Add(employee);
+            return employee;
+        }
+
+        public Employee Delete(int id)
+        {
+            Employee emp=EmpList.FirstOrDefault(e=>e.Id==id);
+            if (emp != null)
+            {
+                EmpList.Remove(emp);
+            }
+            return emp;
+        }
+
+        public IEnumerable<Employee> GetAllEmployee()
+        {
+           return EmpList;
+        }
+
+        public Employee GetEmployee(int id)
+        {
+            Employee e= EmpList.FirstOrDefault(e=>e.Id==id);
+            if(e!=null)
+            {
+                return e;
+            }
+            return e;
+        }
+
+        public Employee Update(Employee empChange)
+        {
+            Employee e=EmpList.FirstOrDefault(e=>e.Id==empChange.Id);
+            if (e!=null)
+            {
+                e.FirstName = empChange.FirstName;
+                e.LastName = empChange.LastName;
+                e.Gender = empChange.Gender;
+                e.Address = empChange.Address;
+                e.Salary = empChange.Salary;
+
+            }
+            return e;
+        }
+    }
+}
+
+// Entry class:
+
+namespace InMemoryCrud2
+{
+    internal class Program
+    {
+
+        static void Display(EmployeeServices services)
+        {
+            foreach (Employee emp in services.GetAllEmployee())
+            {
+                Console.WriteLine("{0}\t {1}{2}\t{3} \t {4} \t {5}", emp.Id, emp.FirstName, emp.LastName, emp.Salary, emp.Gender, emp.Address);
+            }
+
+        }
+
+
+        static void Main(string[] args)
+        {
+            EmployeeServices services = new EmployeeServices();
+            //services.GetAllEmployee();
+            services.Add(new Employee { FirstName = "Anup", LastName = "Ingle", Salary = 29000, Gender = "Male", Address = "Nashik" });
+            //services.Delete(1);
+            services.Update(new Employee { Id = 1, FirstName = "Bhushan", LastName = "G", Salary = 30000, Gender = "Male", Address = "Nashik" });
+
+            Display(services);
+
+        }
+    }
+}I
